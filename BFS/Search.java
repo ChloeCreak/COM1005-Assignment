@@ -20,7 +20,9 @@ public abstract class Search {
 	protected ArrayList<SearchNode> successorNodes; // used in expand & vetSuccessors
 
 	/**
-	 * run a search
+	 * ------------------------------------
+	 * 			RUN THE SEARCH
+	 * ------------------------------------
 	 * 
 	 * @param initState initial state
 	 * @param strat     - String specifying strategy
@@ -28,66 +30,69 @@ public abstract class Search {
 	 */
 	public String runSearch(SearchState initState, String strategy) {
 
-		initNode = new SearchNode(initState); // create initial node
+		initNode = new SearchNode(initState); // create the first node at the top of three
 
-		System.out.println("Starting " + strategy + " Search"); // change from search1 - print strategy
+		System.out.println("Starting " + strategy + " Search"); // outputs strategy
 
-		open = new ArrayList<SearchNode>(); // initial open, closed
-		open.add(initNode);
+		open = new ArrayList<SearchNode>(); // creates the arrayList of 'open' nodes (ones yet to be explored)
+		open.add(initNode); // adds the first node (initNode) to this list
 
-		closed = new ArrayList<SearchNode>();
+		closed = new ArrayList<SearchNode>(); // creates the arrayList of 'closed' node (the ones unexplored)
 
-		int iterationCount = 1; // counts the iterations
+		int iterationCount = 1; // counter
 
-		while (!open.isEmpty()) {
+		while (!open.isEmpty()) { // implents the search - checking in a loop if the current node is the wanted node
+			// as well as implenting the search strategy everytime it goes to a new node
 
-			// print contents of open
+			// print contents of open aka the nodes left to search (and the counter)
 			System.out.println("iteration no " + iterationCount);
 			System.out.println("open is");
-			for (SearchNode nn : open) {
-				String nodestr = nn.toString();
+			for (SearchNode nn : open) { // FOR loop to output the contents of the arrayList open
+				String nodestr = nn.toString(); // making list into a string to output
 				System.out.println(nodestr);
 			}
 
-			selectNode(strategy); // change from search1 - selectNode selects next node, given strategy
-			// makes it currentNode & removes it from open
+			selectNode(strategy); // selects next node given the strategy
+			// and makes it the currentNode & removes it from open
 			System.out.println("Current node " + currentNode.toString());
 
-			if (currentNode.goalPredicate(this))
-				return reportSuccess(); // success
-			// change from search1 - call reportSuccess
-			// - must pass search instance to goalP
-			expand(); // go again
+			if (currentNode.goalPredicate(this)) // checking if current node is the wanted node
+				return reportSuccess();
 
-			closed.add(currentNode); // put current node on closed
+			expand(); // current node is not the wanted node so the process is repeated
+
+			closed.add(currentNode); // add current node to the closed arrayList
 
 			iterationCount = iterationCount + 1;
 		}
 		;
 
-		return "Search Fails"; // out of the while loop - failure
+		return "Search Fails"; // out of the while loop (failure)
 
 	}
 
-	// expand current node
+	// ------------------------------------
+	//			EXPAND CURRENT NODE
+	// ------------------------------------
 
 	private void expand() {
 
 		// get all successor nodes
 		successorNodes = currentNode.getSuccessors(this); // pass search instance
+		// getSuccessors is from SearchNode.java
 
-		// filter out unwanted - Dynamic Programming check
-		vetSuccessors();
+		vetSuccessors(); // Dynamic Programming check
 
-		// add surviving nodes to open
-		// change from search1 - set their parents to currentNode
 		for (SearchNode snode : successorNodes) {
-			open.add(snode);
-			snode.setParent(currentNode);
+			open.add(snode); // add surviving nodes to open arrayList
+			snode.setParent(currentNode); // set their parents to currentNode
 		}
 	}
 
-	// vet the successors - reject any whose states are on open or closed
+	// ------------------------------------
+	//		REJECT OPEN/CLOSED STATES
+	// ------------------------------------
+	// vet the successors - reject any states are on the open or closed arrayLists
 
 	private void vetSuccessors() {
 
@@ -101,6 +106,9 @@ public abstract class Search {
 		successorNodes = vslis;
 	}
 
+	// ------------------------------------
+	//		IS CURRENT NODE CLOSED?
+	// ------------------------------------
 	// onClosed - is the state for a node the same as one on closed?
 
 	private boolean onClosed(SearchNode newNode) {
@@ -111,6 +119,10 @@ public abstract class Search {
 		}
 		return ans;
 	}
+
+	// ------------------------------------
+	//		IS CURRENT NODE OPEN?
+	// ------------------------------------
 	// onOpen - is the state for a node the same as one on closed?
 
 	private boolean onOpen(SearchNode newNode) {
@@ -122,6 +134,9 @@ public abstract class Search {
 		return ans;
 	}
 
+	// ------------------------------------
+	//			SELECTS NEXT NODE
+	// ------------------------------------
 	// select the next node - change from search1
 	// call depthFirst or breadthFirst dependent on strat
 	// defaults to breadthFirst
@@ -133,19 +148,31 @@ public abstract class Search {
 			breadthFirst();
 	}
 
+	// ------------------------------------
+	//			DEPTH-FIRST
+	// ------------------------------------
+
 	private void depthFirst() {
 		int osize = open.size();
 		currentNode = (SearchNode) open.get(osize - 1); // last node added to open
 		open.remove(osize - 1); // remove it
 	}
 
+	// ------------------------------------
+	//			BREADTH-FIRST
+	// ------------------------------------
+
 	private void breadthFirst() {
 		currentNode = (SearchNode) open.get(0); // first node on open
 		open.remove(0);
 	}
 
+	// ------------------------------------
+	//		RUNS WHEN NODE IS FOUND
+	// ------------------------------------
 	// change from search1
 	// report success - reconstruct path, convert to string & return
+
 	private String reportSuccess() {
 
 		SearchNode n = currentNode;
