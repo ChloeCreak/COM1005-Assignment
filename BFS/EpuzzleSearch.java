@@ -1,5 +1,8 @@
 public class EpuzzleSearch extends Search{
-    public EpuzzleSearch (int state, int tar){
+    private int[][] puzzleState;
+    private int[][] target;
+    
+    public EpuzzleSearch (int[][] state, int[][] tar){
         puzzleState = state;
         target = tar;
     }
