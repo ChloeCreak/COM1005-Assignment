@@ -1,3 +1,5 @@
+package Astar;
+
 /**
  * State in an 8 puzzle problem
  *

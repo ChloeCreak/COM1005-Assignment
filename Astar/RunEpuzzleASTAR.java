@@ -1,3 +1,4 @@
+package Astar;
 public class RunEpuzzleASTAR {
     public static void main(String[] arg) {
 

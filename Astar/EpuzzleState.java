@@ -1,5 +1,9 @@
+package Astar;
+import java.util.*;
+
 public class EpuzzleState extends SearchState {
     private int[][] puzzleState;
+    private String method;
     
     public EpuzzleState(int[][] state, int lc, int erc, String meth){
         puzzleState = state;
@@ -9,7 +13,7 @@ public class EpuzzleState extends SearchState {
     }
 
     public int[][] getPuzzleState(){
-        return puzzleState
+        return puzzleState;
     }
 
     public String getMethod(){
@@ -64,13 +68,129 @@ public class EpuzzleState extends SearchState {
         int count = 0;
 
         for (int i = 0; i < 3; i++){
-            for(int j = 0, j < 3, j++){
+            for(int j = 0; j < 3; j++){
                 if (state[i][j] != target[i][j]){
                     count ++;
                 }
             }
         }
+
+        return count;
     }
+
+    // ------------------------------------
+	//		    MOVE STATE UP
+	// ------------------------------------
+    // @param state - the current search
+    // @param column
+    // @param row
+    // @return puzzle with state position changed
+
+    public int[][] moveUp(int[][] state, int row, int column) {
+        int newRow = row - 1;
+        
+        // creating the new array to return
+        int[][] returnPuzzle = new int[3][3];
+        for(int i = 0; i < 3; i++){
+            returnPuzzle[i] =  state[i].clone();
+        }
+        // moving the state up one square
+        int temp = returnPuzzle[newRow][column];
+        returnPuzzle[newRow][column] = returnPuzzle[row][column];
+        returnPuzzle[row][column] = temp;
+        
+        return returnPuzzle;
+    } 
+
+    // ------------------------------------
+	//		    MOVE STATE DOWN
+	// ------------------------------------
+    // @param state - the current search
+    // @param column
+    // @param row
+    // @return puzzle with state position changed
+
+    public int[][] moveDown(int[][] state, int row, int column) {
+        int newRow = row + 1;
+        
+        // creating the new array to return
+        int[][] returnPuzzle = new int[3][3];
+        for(int i = 0; i < 3; i++){
+            returnPuzzle[i] =  state[i].clone();
+        }
+        // moving the state up one square
+        int temp = returnPuzzle[newRow][column];
+        returnPuzzle[newRow][column] = returnPuzzle[row][column];
+        returnPuzzle[row][column] = temp;
+        
+        return returnPuzzle;
+    } 
+
+    // ------------------------------------
+	//		    MOVE STATE RIGHT
+	// ------------------------------------
+    // @param state - the current search
+    // @param column
+    // @param row
+    // @return puzzle with state position changed
+
+    public int[][] moveRight(int[][] state, int row, int column) {
+        int newColumn = row + 1;
+        
+        // creating the new array to return
+        int[][] returnPuzzle = new int[3][3];
+        for(int i = 0; i < 3; i++){
+            returnPuzzle[i] =  state[i].clone();
+        }
+        // moving the state up one square
+        int temp = puzzleState[row][newColumn];
+        puzzleState[row][newColumn] = puzzleState[row][column];
+        puzzleState[row][column] = temp;
+        
+        return returnPuzzle;
+    } 
+
+    // ------------------------------------
+	//		    MOVE STATE LEFT
+	// ------------------------------------
+    // @param state - the current search
+    // @param column
+    // @param row
+    // @return puzzle with state position changed
+
+    public int[][] moveLeft(int[][] state, int row, int column) {
+        int newColumn = row - 1;
+        
+        // creating the new array to return
+        int[][] returnPuzzle = new int[3][3];
+        for(int i = 0; i < 3; i++){
+            returnPuzzle[i] =  state[i].clone();
+        }
+        // moving the state up one square
+        int temp = puzzleState[row][newColumn];
+        puzzleState[row][newColumn] = puzzleState[row][column];
+        puzzleState[row][column] = temp;
+        
+        return returnPuzzle;
+    } 
+
+    // ------------------------------------
+	//		    GOAL PREDICATE
+	// ------------------------------------
+    // checks if the current puzzle is equal to the target puzzle
+    // @param searcher - the current search
+    // @return true/false - true if arrays are equal
+
+    public boolean goalPredicate(Search searcher) {
+        EpuzzleSearch eSearcher = (EpuzzleSearch) searcher;
+        int[][] tar = eSearcher.getTarget();
+        if(Arrays.deepEquals(puzzleState, tar) == true){ // deepEquals() checks if two arrays are equal
+            return true;
+        } else{
+            return false;
+        }
+    }
+
 
     // ------------------------------------
 	//		    GET SUCCESSORS
@@ -84,7 +204,13 @@ public class EpuzzleState extends SearchState {
         // sets rules for each square
 
         EpuzzleSearch eSearcher = (EpuzzleSearch) searcher;
-        EpuzzleState puzzle = (EpuzzleState) eSearcher.currentNode.getState();
+        EpuzzleState puzzle = (EpuzzleState) eSearcher.currentNode.get_State();
+
+        // create puzzle to edit with the 'move' functions
+        int[][] movePuzzle = new int[3][3];
+        for(int i = 0; i < 3; i++){
+            movePuzzle[i] =  puzzleState[i].clone();
+        }
 
         this.puzzleState = puzzle.getPuzzleState();
     
@@ -95,96 +221,96 @@ public class EpuzzleState extends SearchState {
 
         if(getMethod().equals("manhatten")){
             if(puzzleState[0][0] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 0, 0), 1, manhattan(moveRight(searcher, 0, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 0), 1, manhattan(moveDown(searcher, 0, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 0, 0), 1, manhattan(moveRight(movePuzzle, 0, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 0), 1, manhattan(moveDown(movePuzzle, 0, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[0][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 0, 1), 1, manhattan(moveRight(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 0, 1), 1, manhattan(moveLeft(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 1), 1, manhattan(moveDown(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 0, 1), 1, manhattan(moveRight(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 0, 1), 1, manhattan(moveLeft(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 1), 1, manhattan(moveDown(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[0][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 0, 2), 1, manhattan(moveLeft(searcher, 0, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 2), 1, manhattan(moveDown(searcher, 0, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 0, 2), 1, manhattan(moveLeft(movePuzzle, 0, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 2), 1, manhattan(moveDown(movePuzzle, 0, 2), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][0] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 1, 0), 1, manhattan(moveRight(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 0), 1, manhattan(moveUp(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 0), 1, manhattan(moveDown(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 1, 0), 1, manhattan(moveRight(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 0), 1, manhattan(moveUp(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 0), 1, manhattan(moveDown(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 1, 1), 1, manhattan(moveRight(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 1, 1), 1, manhattan(moveLeft(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 1), 1, manhattan(moveUp(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 1), 1, manhattan(moveDown(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 1, 1), 1, manhattan(moveRight(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 1, 1), 1, manhattan(moveLeft(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 1), 1, manhattan(moveUp(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 1), 1, manhattan(moveDown(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 1, 2), 1, manhattan(moveLeft(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 2), 1, manhattan(moveUp(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 2), 1, manhattan(moveDown(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 1, 2), 1, manhattan(moveLeft(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 2), 1, manhattan(moveUp(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 2), 1, manhattan(moveDown(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][0] == 0){
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 0), 1, manhattan(moveUp(searcher, 2, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveRight(searcher, 2, 0), 1, manhattan(moveRight(searcher, 2, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 0), 1, manhattan(moveUp(movePuzzle, 2, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 2, 0), 1, manhattan(moveRight(movePuzzle, 2, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 2, 1), 1, manhattan(moveRight(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 2, 1), 1, manhattan(moveLeft(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 1), 1, manhattan(moveUp(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 2, 1), 1, manhattan(moveRight(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 2, 1), 1, manhattan(moveLeft(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 1), 1, manhattan(moveUp(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 2, 2), 1, manhattan(moveLeft(searcher, 2, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 2), 1, manhattan(moveUp(searcher, 2, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 2, 2), 1, manhattan(moveLeft(movePuzzle, 2, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 2), 1, manhattan(moveUp(movePuzzle, 2, 2), eSearcher.getTarget()), getMethod() ));
             }
         }
         else {
             if(puzzleState[0][0] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 0, 0), 1, hammingDistance(moveRight(searcher, 0, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 0), 1, hammingDistance(moveDown(searcher, 0, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 0, 0), 1, hammingDistance(moveRight(movePuzzle, 0, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 0), 1, hammingDistance(moveDown(movePuzzle, 0, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[0][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 0, 1), 1, hammingDistance(moveRight(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 0, 1), 1, hammingDistance(moveLeft(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 1), 1, hammingDistance(moveDown(searcher, 0, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 0, 1), 1, hammingDistance(moveRight(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 0, 1), 1, hammingDistance(moveLeft(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 1), 1, hammingDistance(moveDown(movePuzzle, 0, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[0][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 0, 2), 1, hammingDistance(moveLeft(searcher, 0, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 0, 2), 1, hammingDistance(moveDown(searcher, 0, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 0, 2), 1, hammingDistance(moveLeft(movePuzzle, 0, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 0, 2), 1, hammingDistance(moveDown(movePuzzle, 0, 2), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][0] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 1, 0), 1, hammingDistance(moveRight(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 0), 1, hammingDistance(moveUp(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 0), 1, hammingDistance(moveDown(searcher, 1, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 1, 0), 1, hammingDistance(moveRight(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 0), 1, hammingDistance(moveUp(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 0), 1, hammingDistance(moveDown(movePuzzle, 1, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 1, 1), 1, hammingDistance(moveRight(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 1, 1), 1, hammingDistance(moveLeft(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 1), 1, hammingDistance(moveUp(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 1), 1, hammingDistance(moveDown(searcher, 1, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 1, 1), 1, hammingDistance(moveRight(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 1, 1), 1, hammingDistance(moveLeft(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 1), 1, hammingDistance(moveUp(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 1), 1, hammingDistance(moveDown(movePuzzle, 1, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[1][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 1, 2), 1, hammingDistance(moveLeft(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 1, 2), 1, hammingDistance(moveUp(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveDown(searcher, 1, 2), 1, hammingDistance(moveDown(searcher, 1, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 1, 2), 1, hammingDistance(moveLeft(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 1, 2), 1, hammingDistance(moveUp(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveDown(movePuzzle, 1, 2), 1, hammingDistance(moveDown(movePuzzle, 1, 2), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][0] == 0){
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 0), 1, hammingDistance(moveUp(searcher, 2, 0), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveRight(searcher, 2, 0), 1, hammingDistance(moveRight(searcher, 2, 0), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 0), 1, hammingDistance(moveUp(movePuzzle, 2, 0), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 2, 0), 1, hammingDistance(moveRight(movePuzzle, 2, 0), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][1] == 0){
-                openList.add(new EpuzzleState(moveRight(searcher, 2, 1), 1, hammingDistance(moveRight(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveLeft(searcher, 2, 1), 1, hammingDistance(moveLeft(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 1), 1, hammingDistance(moveUp(searcher, 2, 1), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveRight(movePuzzle, 2, 1), 1, hammingDistance(moveRight(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 2, 1), 1, hammingDistance(moveLeft(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 1), 1, hammingDistance(moveUp(movePuzzle, 2, 1), eSearcher.getTarget()), getMethod() ));
             }
             if(puzzleState[2][2] == 0){
-                openList.add(new EpuzzleState(moveLeft(searcher, 2, 2), 1, hammingDistance(moveLeft(searcher, 2, 2), eSearcher.getTarget()), getMethod() )));
-                openList.add(new EpuzzleState(moveUp(searcher, 2, 2), 1, hammingDistance(moveUp(searcher, 2, 2), eSearcher.getTarget()), getMethod() )));
+                openList.add(new EpuzzleState(moveLeft(movePuzzle, 2, 2), 1, hammingDistance(moveLeft(movePuzzle, 2, 2), eSearcher.getTarget()), getMethod() ));
+                openList.add(new EpuzzleState(moveUp(movePuzzle, 2, 2), 1, hammingDistance(moveUp(movePuzzle, 2, 2), eSearcher.getTarget()), getMethod() ));
+            }
         }
         
         for (EpuzzleState openListValues : openList){
-            closedList.add((SearchState) openListValues)
+            closedList.add((SearchState) openListValues);
         }
-
         return closedList;
     }
 
@@ -194,18 +320,18 @@ public class EpuzzleState extends SearchState {
     // comparing two arrays and seeing if they are equal
     // returns true if equal
 
-    boolean sameState(SearchState n2){
-        EpuzzleState stateObject = (EpuzzleState) n2;
-        int[][] objectArray = stateObject.getPuzzleState(); // to compare to
-
+    public boolean sameStateExtra (Object objectArray){
         boolean checker = true;
-        if(objectArray == stateObject){
-            return checker;
+        int puzzleLength = this.puzzleState.length;
+        
+        if (this == objectArray){
+            return true;
         }
-
-        for(int i = 0; i < stateObject.length; i++){
-            for(int j = 0; j < objectArray.length; j++){
-                if(stateObject[i][j] != objectArray[i][j]){
+        
+        EpuzzleState openList = (EpuzzleState) objectArray;
+        for (int i = 0; i < puzzleLength; i++) {
+            for (int j = 0; j < this.puzzleState[i].length; j++) {
+                if (this.puzzleState[i][j] != openList.getPuzzleState()[i][j]) {
                     checker = false;
                     break;
                 }
@@ -214,103 +340,14 @@ public class EpuzzleState extends SearchState {
         return checker;
     }
 
+/**
+ * sameState - do 2 EPuzzleSearch nodes have the same state?
+ * @param s2 second state
+ */
 
-    // ------------------------------------
-	//		    MOVE STATE UP
-	// ------------------------------------
-    // @param state - the current search
-    // @param column
-    // @param row
-    // @return puzzle with state position changed
-
-    public EpuzzleState moveUp(int[][] state, int row, int column) {
-        int newRow = row - 1;
-        
-        // creating the new array to return
-        int[][] returnPuzzle = new int[3][3];
-        for(int i = 0; i < 3; i++){
-            returnPuzzle[i] =  state[i].clone();
-        }
-        // moving the state up one square
-        int temp = returnPuzzle[newRow][column];
-        returnPuzzle[newRow][column] = returnPuzzle[row][column];
-        returnPuzzle[row][column] = temp;
-        
-        return new EpuzzleState(returnPuzzle, 1, 1);
-    } 
-
-    // ------------------------------------
-	//		    MOVE STATE DOWN
-	// ------------------------------------
-    // @param state - the current search
-    // @param column
-    // @param row
-    // @return puzzle with state position changed
-
-    public EpuzzleState moveDown(int[][] state, int row, int column) {
-        int newRow = row + 1;
-        
-        // creating the new array to return
-        int[][] returnPuzzle = new int[3][3];
-        for(int i = 0; i < 3; i++){
-            returnPuzzle[i] =  state[i].clone();
-        }
-        // moving the state up one square
-        int temp = returnPuzzle[newRow][column];
-        returnPuzzle[newRow][column] = returnPuzzle[row][column];
-        returnPuzzle[row][column] = temp;
-        
-        return new EpuzzleState(returnPuzzle, 1, 1);
-    } 
-
-    // ------------------------------------
-	//		    MOVE STATE RIGHT
-	// ------------------------------------
-    // @param state - the current search
-    // @param column
-    // @param row
-    // @return puzzle with state position changed
-
-    public EpuzzleState moveRight(int[][] state, int row, int column) {
-        int newColumn = row + 1;
-        
-        // creating the new array to return
-        int[][] returnPuzzle = new int[3][3];
-        for(int i = 0; i < 3; i++){
-            returnPuzzle[i] =  state[i].clone();
-        }
-        // moving the state up one square
-        int temp = puzzleState[row][newColumn];
-        puzzleState[row][newColumn] = puzzleState[row][column];
-        puzzleState[row][column] = temp;
-        
-        return new EpuzzleState(returnPuzzle, 1, 1);
-    } 
-
-    // ------------------------------------
-	//		    MOVE STATE LEFT
-	// ------------------------------------
-    // @param state - the current search
-    // @param column
-    // @param row
-    // @return puzzle with state position changed
-
-    public EpuzzleState moveLeft(int[][] state, int row, int column) {
-        int newColumn = row - 1;
-        
-        // creating the new array to return
-        int[][] returnPuzzle = new int[3][3];
-        for(int i = 0; i < 3; i++){
-            returnPuzzle[i] =  state[i].clone();
-        }
-        // moving the state up one square
-        int temp = puzzleState[row][newColumn];
-        puzzleState[row][newColumn] = puzzleState[row][column];
-        puzzleState[row][column] = temp;
-        
-        return new EpuzzleState(returnPuzzle, 1, 1);
-    } 
+public boolean sameState (SearchState s2) {
+        EpuzzleState objectArray = (EpuzzleState) s2;
+        return this.sameStateExtra(objectArray);
 }
 
-    
 }

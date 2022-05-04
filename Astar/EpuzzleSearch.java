@@ -1,3 +1,4 @@
+package Astar;
 public class EpuzzleSearch extends Search{
     private int[][] puzzleState;
     private int[][] target;

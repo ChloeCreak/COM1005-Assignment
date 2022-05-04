@@ -9,7 +9,7 @@
  * Heidi Christensen (heidi.christensen@sheffield.ac.uk) 2021 version
  *  
 */
-
+package Astar;
 import java.util.*;
 
 public  class SearchNode {
