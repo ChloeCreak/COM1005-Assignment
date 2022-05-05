@@ -340,14 +340,9 @@ public class EpuzzleState extends SearchState {
         return checker;
     }
 
-/**
- * sameState - do 2 EPuzzleSearch nodes have the same state?
- * @param s2 second state
- */
-
-public boolean sameState (SearchState s2) {
+    public boolean sameState (SearchState s2) {
         EpuzzleState objectArray = (EpuzzleState) s2;
         return this.sameStateExtra(objectArray);
-}
+    }
 
 }

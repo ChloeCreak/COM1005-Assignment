@@ -1,4 +1,5 @@
 package Astar;
+
 public class EpuzzleSearch extends Search{
     private int[][] puzzleState;
     private int[][] target;
@@ -8,11 +9,11 @@ public class EpuzzleSearch extends Search{
         target = tar;
     }
 
-    public int getPuzzleState(){
+    public int[][] getPuzzleState(){
         return puzzleState;
     }
 
-    public int getTarget(){
+    public int[][] getTarget(){
         return target;
     }
 }

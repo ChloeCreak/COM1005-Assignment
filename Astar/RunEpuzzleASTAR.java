@@ -1,4 +1,5 @@
 package Astar;
+
 public class RunEpuzzleASTAR {
     public static void main(String[] arg) {
 
@@ -13,6 +14,14 @@ public class RunEpuzzleASTAR {
         String resb = searcher.runSearch(initState, "AStar");
 
         System.out.println(resb);
+
+        // generator given seed
+        int seed = 23456;
+        EpuzzGen gen = new EpuzzGen(seed);
+        // generate puzzle providing difficulty
+        int d = 6;
+        int[][] puzz = gen.puzzGen(d);
     
     }  
 }
+

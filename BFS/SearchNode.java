@@ -1,3 +1,5 @@
+package BFS;
+
 
 /**
 *	Node in a state-space search

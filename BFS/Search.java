@@ -1,3 +1,5 @@
+package BFS;
+
 
 /**
 *	Search.java -
